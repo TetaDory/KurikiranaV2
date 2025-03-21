@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikirana</title>
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aboutus.css') }}">
+    <!-- Link to Font Awesome CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <div class="background-container">
+        <header>
+            <h1>Kurikirana</h1>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-content">
+                    {% if current_user.is_authenticated or session['google_user'] %}
+                    <a href="{{ url_for('index') }}">Home</a>    
+                    <a href="{{ url_for('facilities') }}">Item Management</a>
+                    <a href="{{ url_for('aboutus') }}">Contact</a>
+                    <a href="{{ url_for('logout') }}">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('index') }}">Home</a> 
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                    <a href="{{ url_for('aboutus') }}">Contact</a>
+                    <a href="#">About us</a>
+                {% endif %}
+                </div>
+            </div>  
+        </header>
+        <main>
+            <div class="container">
+                <h2>About us</h2>
+                <div class="pcontainer">
+                    <p>Kurikirana is a food tracker that allows you to monitor your stock across the world. You will be to know at what temperature your storage facility is at at the exact degree and hour. You will also be able to monitor the Humidity and any fluctuations that may occur in both the temperature and the humidity. This will allow you to have control on your food items and help avoid spoilage to the maximum. This is because humidity and temperature are two of the main factors that contribute to premature spoilage.
+                    </p>
+                </div>
+                <a href="{{ url_for('register') }}" class="btn">Get Started</a>
+            </div>
+            <div class="container">
+                <p>You can now track in realtime all your products </p>
+                <p>Thank you for being part of Kurikirana. Start getting insight today.</p>
+			</div>
+            <div class="second-section">
+                <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
+            </div>
+            
+        </main>
+        <footer>
+            <p>&copy; 2025 Kurikirana</p>
+        </footer>
+    </div>
+</body>
+  </script>
+</html>

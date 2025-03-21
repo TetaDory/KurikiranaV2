@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikirana</title>
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <!-- Link to Font Awesome CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <div class="background-container">
+        <header>
+            <h1>Kurikirana</h1>
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-content">
+                    {% if current_user.is_authenticated or session['google_user'] %}
+                        <a href="{{ url_for('facilities') }}">Item Management</a>
+                        <!-- <a href="{{ url_for('dashboard') }}">Dashboard</a> -->
+                        <a href="{{ url_for('aboutus') }}">About Us</a>
+                        <a href="{{ url_for('contact') }}">Contact</a>
+                        <a href="{{ url_for('logout') }}">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">Login</a>
+                        <a href="{{ url_for('register') }}">Register</a>
+                        <a href="{{ url_for('aboutus') }}">About us</a>
+                    {% endif %}
+                </div>
+            </div>  
+        </header>
+        <main>
+            {% if current_user.is_authenticated or session['google_user'] %}
+            <div class="container">
+                {% if session['google_user'] %}
+                <h2>Welcome, {{ session['google_user']['name'] }}!</h2>
+                {% elif current_user.is_authenticated %}
+                <h2>Welcome, {{ current_user.username }}!</h2>
+                {% endif %}
+                <p>Thank you for being part of Kurikirana. You can now track in realtime all your products </p>
+                <p>Start getting insight today.
+                    <br>
+                    Add your items to your dashboard and see what is going on in your storage facility
+                </p>
+                
+                <a href="{{ url_for('facilities') }}" class="btn">Item Management</a>
+                <div class="second-section">
+                    <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
+                    <img src="../static/images/2.png" width="1000">
+                </div>
+			</div>
+            {% else %}
+
+            <div class="container">
+                <h2>Welcome To Kurikirana</h2>
+                <div class="pcontainer">
+                    <p>Kurikirana helps you track your food across the world and give you real-time insights on its conditions</p>
+                </div>
+                <div class="second-section">
+                    <a href="{{ url_for('register') }}" class="btn">Get Started</a>
+                    <a href="{{ url_for('aboutus') }}" class="btn">About us</a>
+                </div>
+            </div>
+            
+            <div class="second-section">
+                <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
+                <img src="../static/images/2.png" width="1000">
+            </div>
+            
+        </main>
+        <footer>
+            <p>&copy; 2025 Kurikirana</p>
+        </footer>
+    </div>
+        {% endif %}
+</body>
+<script>
+    let logoutTimer;
+  
+    function startLogoutTimer() {
+      logoutTimer = setTimeout(logout, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
+    }
+  
+    function resetLogoutTimer() {
+      clearTimeout(logoutTimer);
+      startLogoutTimer();
+    }
+  
+    function logout() {
+      window.location.href = '/logout';
+    }
+
+    function handlePageClose() {
+      resetLogoutTimer();
+      logout(); // Perform logout when the page is closed
+    }
+  
+    // Attach event listeners to reset the timer on user activity
+    document.addEventListener('mousemove', resetLogoutTimer);
+    document.addEventListener('keypress', resetLogoutTimer);
+  
+    // Start the initial timer when the page loads
+    startLogoutTimer();
+    // Handle the beforeunload event to logout when the page is closed
+    window.addEventListener('beforeunload', function (event) {
+        // You may want to add a confirmation message here
+        logout();
+    })
+  </script>
+</html>

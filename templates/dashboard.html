@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../static/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Kurikirana</h1>
+        <div class="dropdown">
+            <button class="dropbtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="dropdown-content">
+                {% if current_user.is_authenticated or session['google_user'] %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('facilities') }}">Item Management</a>
+                    <a href="{{ url_for('aboutus') }}">About Us</a>
+                    <a href="{{ url_for('contact') }}">Contact</a>
+                    <a href="{{ url_for('logout') }}">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+                {% else %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                    <a href="{{ url_for('aboutus') }}">About us</a>
+                {% endif %}
+            </div>
+        </div> 
+    </header>
+    <div class="content-wrapper">
+    <div class="sidebar">
+            <h2>Dashboard</h2>
+        <ul>
+            <li><a href="{{ url_for('facilities') }}">Item Management</a></li>
+            <li><div class="dropdown">
+                <text class="dropbtna">Reports</text>
+                <div class="dropdown-content">
+                  <a href="{{ url_for('tempreport') }}">Temperature Alerts</a>
+                  <a href="{{ url_for('humireport') }}">Humidity Alerts</a>
+                </div>
+              </div>
+            </li>
+
+            <li><a href="{{ url_for('aboutus')}}">About us</a></li>
+            <li><a href="{{ url_for('contact')}}">Contact us</a></li>
+            <a href="{{ url_for('logout') }}">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+        </ul>
+    </div>
+    <main>
+        <div class="itemnbr">
+        <h2>Item Nº3</h2>
+        </div>
+        <div class="excel">
+            <button onclick="exportData()">Export data to Excel</button>
+        </div>
+        <div class="main-content">
+            <div class="dashboard-container">
+                <div class="card">
+                    <div class="header">
+                        Humidity Monitoring Dashboard
+                    </div>
+                    <h3>Temperature Trends</h3>
+                    <canvas id="temperatureChart" class="chart"></canvas>
+                </div>
+
+            <div class="card">
+                <div class="header">
+                    Temperature Monitoring Dashboard
+                </div>
+                <h3>Humidity Levels</h3>
+                <canvas id="humidityChart" class="chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+    <script>
+        function exportData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const itemId = urlParams.get('item_id');
+
+            if (itemId) {
+                window.location.href = `/export_excel/${itemId}`;
+            } else {
+                console.error("item_id not found in URL.");
+                alert("Could not export data. item_id not found.");
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <footer>
+        <p>&copy; 2025 Kurikirana</p>
+    </footer>
+</body>
+</html>

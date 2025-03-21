@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Food Item</title>
+    <link rel="stylesheet" href="../static/css/editfood.css">
+</head>
+<body>
+    <h1>Edit Food Item</h1>
+    <button type="submit" class="btn" onclick="openEditPopup()">Edit Item</button>
+    <div class="popup" id="editpopup">
+        <i class="fa fa-close" onclick="closeEditPopup()"></i>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.food_name.label }} {{ form.food_name() }}<br>
+            </div>
+            <br>
+            <div class="mb-3">
+                {{ form.batch_number.label }} {{ form.batch_number() }}
+            </div>
+            <br>
+            <div class="mb-3">
+                {{ form.maximum_temperature.label }} {{ form.maximum_temperature() }}
+            </div>
+            <br>
+            <div class="mb-3">
+                {{ form.maximum_humidity.label }} {{ form.maximum_humidity() }} 
+            </div>
+            <br>
+            <div class="mb-3">
+                {{ form.submit() }}
+            </div> 
+        </form>
+    </div>
+    <script>
+        let editpopup = document.getElementById("editpopup");
+
+        function openEditPopup(){
+            editpopup.classList.add("open-popup");
+        }
+
+        function closeEditPopup(){
+            editpopup.classList.remove("open-popup");
+        }
+
+        function submitForm() {
+            const foodName = document.getElementById("foodName").value;
+            const optimumTemperature = document.getElementById("optimumTemperature").value;
+            const optimumHumidity = document.getElementById("optimumHumidity").value;
+            // Basic validation (you can add more robust validation)
+            if (!foodName || isNaN(optimumTemperature) || isNaN(optimumHumidity)) {
+                alert("Please fill in all fields with valid numbers.");
+                return;
+            }
+
+            // You can now send this data to your backend or process it as needed.
+            const foodData = {
+                foodName: foodName,
+                optimumTemperature: parseFloat(optimumTemperature),
+                optimumHumidity: parseFloat(optimumHumidity)
+            };
+
+            console.log("Food data:", foodData);
+            document.getElementById("foodForm").reset()
+        }
+    </script>
+</body>
+</html>

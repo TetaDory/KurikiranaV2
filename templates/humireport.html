@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports</title>
+    <link rel="stylesheet" href="../static/css/humireport.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Kurikirana</h1>
+        <div class="dropdown">
+            <button class="dropbtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="dropdown-content">
+                {% if current_user.is_authenticated or session['google_user'] %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('facilities') }}">Item Management</a>
+                    <a href="{{ url_for('aboutus') }}">About Us</a>
+                    <a href="{{ url_for('contact') }}">Contact</a>
+                    <a href="{{ url_for('logout') }}">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+                {% else %}
+                    <a href="{{ url_for('index') }}">Home</a>
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                    <a href="{{ url_for('aboutus') }}">About us</a>
+                {% endif %}
+            </div>
+        </div> 
+    </header>
+    <div class="content-wrapper">
+    <div class="sidebar">
+            <h2>Report</h2>
+        <ul>
+            <li><a href="{{ url_for('facilities') }}">Item Management</a></li>
+            <!-- <li><a href="#">Settings</a></li> -->
+            <li><a href="{{ url_for('aboutus')}}">About us</a></li>
+            <li><a href="{{ url_for('contact')}}">Contact us</a></li>
+            <a href="{{ url_for('logout') }}">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+        </ul>
+    </div>
+    <main>
+        <div class="itemnbr">
+            <h2>Humidity Alerts</h2>
+        </div>
+        <div class="report-container">
+            <h2>Humidity Alerts</h2>
+            <ul id="humidityAlerts">
+                </ul>
+        </div>
+        </div>
+    </div>
+</div>
+
+</main>
+    <script src="/static/js/humireports.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <footer>
+        <p>&copy; 2025 Kurikirana</p>
+    </footer>
+</body>
+</html>

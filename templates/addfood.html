@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Food Item</title>
+    fff
+</head>
+<body>
+    <h1>Add a New Food Item</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div>
+            <label for="name">Food Name</label>
+            {{ form.name }}
+        </div>
+        <div>
+            <label for="optimum_temperature">Optimum Temperature</label>
+            {{ form.optimum_temperature }}
+        </div>
+        <div>
+            <label for="optimum_humidity">Optimum Humidity</label>
+            {{ form.optimum_humidity }}
+        </div>
+        <div>
+            {{ form.submit }}
+        </div>
+    </form>
+</body>
+</html>

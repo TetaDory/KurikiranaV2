@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikirana</title>
+    <!-- Link to CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/explore.css') }}">
+    <!-- Link to Font Awesome CSS file -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <!-- <header>
+        <h1>Kurikirana</h1>
+        <div class="dropdown">
+            <button class="dropbtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="dropdown-content">
+                {% if current_user.is_authenticated or session['google_user'] %}
+                    <a href="{{ url_for('explore') }}">Explore</a>
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('logout') }}">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a>
+                    <a href="{{ url_for('register') }}">Register</a>
+                    <a href="#">About us</a>
+                {% endif %}
+            </div>
+        </div>  
+    </header> -->
+    
+    <div class="container mt-5">
+        <!-- <h1 class="mb-4">Explore Food Names</h1> -->
+        <div class="post-header">
+        </div>
+        <table style="width:100%">
+            <tr>
+                <th>Food Name</th>
+                <th>Batch Number</th>
+            </tr>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.food_name }}</td>
+                <td>{{ post.batch_number }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <footer>
+        <p>&copy; 2025 Kurikirana</p>
+    </footer>
+</body>
+</html>
