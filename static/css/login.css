@@ -9,13 +9,13 @@
 
 body {
   font-family: Inter;
-  line-height: 1.6;
-  margin: 100px;
-  padding: 100px;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
   grid-template-rows: 1fr auto;
-  height: 100%; /* Full height */
+  height: 100vh; /* Full height */
   background-size: cover;
-  display: block; /* Removed flex from body */
+  display: flex; /* Use flex for body */
   
   
   min-height: 100vh;
@@ -24,8 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background-color: var(--background-color);
-  background-image: linear-gradient(#5A67BA, #9EA5D6, white);
+  background-color: white;
   color: #fff;
 }
 
@@ -45,6 +44,11 @@ header h1 {
   font-size: 30px;
   margin: 0;
   flex: 1;
+}
+
+main {
+  padding-top: 200px;
+  padding-right: 50px;
 }
 
 ul {
@@ -156,7 +160,7 @@ footer {
   display: block;
 }
 
-.dropdown-content a:hover {background-color: #ddd;}
+.dropdown-content a:hover {background-color: #000000;}
 
 .dropdown:hover .dropdown-content {display: block;}
 
@@ -168,7 +172,7 @@ footer {
   margin-top: 5px;
   margin-left: 10px;
   background-color: #5A67BA;
-  color: #333;
+  color: #ffffff;
   text-decoration: none;
   border-radius: 4px;
   text-align: center;
@@ -176,7 +180,7 @@ footer {
 }
 
 .btn:hover {
-  background-color: #ffffff;
+  background-color: #5A67BA;
 }
 
 .dropbtn {
@@ -217,3 +221,92 @@ footer {
 .dropdown:hover .dropdown-content {display: block;}
 
 .dropdown:hover .dropbtn {background-color: #5A67BA;}
+
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.image-column {
+  flex: 1;
+  display: flex;
+  align-items: left;
+  justify-content: left;
+}
+
+.form-column {
+    flex: 1; /* Take up 50% of the available space */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form {
+    width: 300px; /* Adjust as needed */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-column {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+main{
+  width: 50%;
+}
+
+.login-page-image{
+  max-width: 50%;
+  max-height: 50%;
+  object-fit: contain;
+
+}
+
+.login-form h2 {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stack columns vertically on smaller screens */
+    }
+
+    .image-column, .form-column {
+        flex: auto;
+        width: 50%;
+    }
+
+    .image-column {
+        height: 300px;
+    }
+}
+
+.login-form {
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-form h2 {
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .container {
+      flex-direction: column;
+  }
+
+  .image-column, .form-column {
+      flex: auto;
+      width: 50%;
+  }
+
+  .image-column {
+      height: 300px;
+  }
+}

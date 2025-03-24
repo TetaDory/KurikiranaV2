@@ -12,12 +12,10 @@
         <link rel="stylesheet" href="css/animate.min.css">
         <link rel="stylesheet" href="css/owl.carousel.min.css">
         <link rel="stylesheet" href="href=css/bootstrap.min.css">
-        
-
         <script src="https://js.stripe.com/v3/"></script>
     </head>
 <body>
-    <header>
+    <!-- <header>
         <h1>Kurikirana</h1>
         <div class="dropdown">
             <button class="dropbtn">
@@ -37,7 +35,11 @@
                 {% endif %}
             </div>
         </div>  
-    </header>
+    </header> -->
+    <div class="container">
+        <div class="image-column">
+            <a href="#" class="image"><img src="/static/images/6.png" alt="" /></a>
+        </div>
     <main>
     <h2>Login</h2>
     <form action="{{ url_for('login') }}" method="post">
@@ -61,8 +63,8 @@
      </p>
  
     </main>
-    <footer>
+    <!-- <footer>
         <p>&copy; 2025 Kurikirana</p>
-    </footer>
+    </footer> -->
 </body>
 </html>
