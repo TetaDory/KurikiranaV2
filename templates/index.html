@@ -6,6 +6,8 @@
     <title>Kurikirana</title>
     <!-- Link to CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <!-- Link to Font Awesome CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -44,6 +46,8 @@
             </div>
         </header>
         <main>
+            <div class="page1">
+            <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="1500">
             {% if current_user.is_authenticated or session['google_user'] %}
             <div class="container">
                 {% if session['google_user'] %}
@@ -60,11 +64,13 @@
                 <a href="{{ url_for('facilities') }}" class="btn">Item Management</a>
                 <div class="second-section">
                     <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
-                    <img src="../static/images/2.png" width="1000">
+                    <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="1500">
+                    <img src="../static/images/1.png" width="1000">
+                </div>
                 </div>
 			</div>
             {% else %}
-
+        </div>
             <div class="container">
                 <h2>Welcome To Kurikirana</h2>
                 <div class="pcontainer">
@@ -78,8 +84,9 @@
             
             <div class="second-section">
                 <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
-                <img src="../static/images/2.png" width="1000">
-            </div>
+                <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="500">
+                <img src="../static/images/2.png" width="1000"></div>
+                </div>
             
         </main>
         <footer>
@@ -88,7 +95,11 @@
     </div>
         {% endif %}
 </body>
-<script>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+        AOS.init();
+        </script>
+    <script>
     let logoutTimer;
   
     function startLogoutTimer() {

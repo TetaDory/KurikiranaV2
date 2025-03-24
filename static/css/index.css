@@ -286,3 +286,37 @@ footer {
 .dropdown:hover .dropdown-content {display: block;}
 
 .dropdown:hover .dropbtn {background-color: #5A67BA;}
+
+@media screen and (max-width: 1400px) {
+  .banner_section .banner_image img {
+      width: 50%;
+  }
+}
+@media screen and (max-width: 1400px) {
+  .banner_section .banner_image img {
+      width: 50%;
+  }
+}
+@media screen and (max-width: 1600px) {
+  .banner_section .banner_image img {
+      width: 50%;
+  }
+}
+img {
+  vertical-align: middle;
+  border-style: none;
+}
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+user agent stylesheet
+img {
+  overflow-clip-margin: content-box;
+  overflow: clip;
+}
+@media screen and (max-width: 767px) {
+  body {
+      font-size: 16px;
+      text-align: center;
+  }
+}
