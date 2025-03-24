@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory - {{ facility_name }}</title>
+    <link rel="stylesheet" href="../static/css/inventory.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <h1>Kurikirana</h1>
+        </div>
+        <div class="header-center">
+            <div class="post-header">
+                <h3>Inventory - {{ facility_name }}</h3>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-content">
+                    {% if current_user.is_authenticated or session['google_user'] %}
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <a href="{{ url_for('aboutus') }}">About Us</a>
+                        <a href="{{ url_for('contact') }}">Contact Us</a>
+                        <a href="{{ url_for('logout') }}">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">Login</a>
+                        <a href="{{ url_for('register') }}">Register</a>
+                        <a href="#">About us</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="sidebar">
+        <h2>Inventory Management</h2>
+    <ul>
+        <!-- <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li> -->
+        <!-- <li><a href="#">Settings</a></li> -->
+        <li><div class="dropdown">
+            <text class="dropbtna">Reports</text>
+            <div class="dropdown-content">
+              <a href="{{ url_for('tempreport') }}">Temperature Alerts</a>
+              <a href="{{ url_for('humireport') }}">Humidity Alerts</a>
+            </div>
+          </div>
+        </li>
+        <li><a href="{{ url_for('management', facility_id=facility_id) }}">Management</a></li>
+        <li><a href="{{ url_for('contact')}}">Contact Us</a></li>
+        <li><a href="{{ url_for('aboutus')}}">About Us</a></li>
+        <a href="{{ url_for('logout') }}">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </a>
+    </ul>
+</div>
+    <div class="container mt-5">
+        <table style="width:100%">
+            <tr>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Value</th>
+                <th>Initial Stock</th>
+                <th>Expiry Date</th>
+                <th>Actions</th>        
+            </tr>
+            {% for post in posts %}
+            <tr>
+                <td>{{ post.food_name }} ({{ post.unit }})</td>
+                <td>{{ post.quantity }}</td>
+                <td>{{ post.unit_price }}</td>
+                <td>
+                    {% if post.quantity is not none and post.unit_price is not none %}
+                        {{ post.quantity * post.unit_price }}
+                    {% else %}
+                        0
+                    {% endif %}
+                </td>
+                <td>{{ post.min_stock }}</td>
+                <td>{{ post.expiration_date }}</td>
+                <td>
+                    <i class="fas fa-plus-circle" onclick="openAddPopup('{{ post.id }}')"></i>
+                    <i class="fas fa-minus-circle" onclick="openRemovePopup('{{ post.id }}')"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    <div class="popup" id="addPopup">
+        <i class="fa fa-close" onclick="closeAddPopup()"></i>
+        <h2>In</h2>
+        <form id="addForm" action="{{ url_for('adjust_quantity', item_id='0', facility_id=facility_id) }}" method="POST">
+            <input type="hidden" name="action" value="add">
+            <input type="hidden" name="item_id" id="addItemId">
+            <label for="quantity_change">Quantity:</label>
+            <br>
+            <br>
+            <input type="number" name="quantity_change" value="1" min="1">
+            <br>
+            <br>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+
+    <div class="popup" id="removePopup">
+        <i class="fa fa-close" onclick="closeRemovePopup()"></i>
+        <h2>Out</h2>
+        <form id="removeForm" action="{{ url_for('adjust_quantity', item_id='0', facility_id=facility_id) }}" method="POST">
+            <input type="hidden" name="action" value="remove">
+            <input type="hidden" name="item_id" id="removeItemId">
+            <label for="quantity_change">Quantity:</label>
+            <br>
+            <br>
+            <input type="number" name="quantity_change" value="1" min="1">
+            <br>
+            <br>
+            <button type="submit">Remove</button>
+        </form>
+    </div>
+
+    <script>
+        let addPopup = document.getElementById("addPopup");
+        let removePopup = document.getElementById("removePopup");
+
+        function openAddPopup(itemId) {
+            document.getElementById("addItemId").value = itemId;
+            addPopup.classList.add("open-popup");
+        }
+
+        function closeAddPopup() {
+            addPopup.classList.remove("open-popup");
+        }
+
+        function openRemovePopup(itemId) {
+            document.getElementById("removeItemId").value = itemId;
+            removePopup.classList.add("open-popup");
+        }
+
+        function closeRemovePopup() {
+            removePopup.classList.remove("open-popup");
+        }
+    </script>
+</body>
+</html>

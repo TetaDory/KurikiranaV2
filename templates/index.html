@@ -1,135 +1,211 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kurikirana</title>
-    <!-- Link to CSS file -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <!-- Link to Font Awesome CSS file -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://js.stripe.com/v3/"></script>
-</head>
-<body>
-    <div class="background-container">
-        <header>
-            <div class="header-left">
-                <h1>Kurikirana</h1>
-            </div>
-            <div class="header-center">
-                <div class="post-header">
-                </div>
-            </div>
-            <div class="header-right">
-                <div class="dropdown">
-                    <button class="dropbtn">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="dropdown-content">
-                        {% if current_user.is_authenticated or session['google_user'] %}
-                        <a href="{{ url_for('facilities') }}">Item Management</a>                        
-                        <a href="{{ url_for('aboutus') }}">About Us</a>
-                        <a href="{{ url_for('contact') }}">Contact</a>
-                        <a href="{{ url_for('logout') }}">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        </a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">Login</a>
-                        <a href="{{ url_for('register') }}">Register</a>
-                        <a href="{{ url_for('aboutus') }}">About us</a>
-                    {% endif %}
-                    </div>
-                </div>
-            </div>
-        </header>
-        <main>
-            <div class="page1">
-            <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="1500">
-            {% if current_user.is_authenticated or session['google_user'] %}
-            <div class="container">
-                {% if session['google_user'] %}
-                <h2>Welcome, {{ session['google_user']['name'] }}!</h2>
-                {% elif current_user.is_authenticated %}
-                <h2>Welcome, {{ current_user.username }}!</h2>
-                {% endif %}
-                <p>Thank you for being part of Kurikirana. You can now track in realtime all your products </p>
-                <p>Start getting insight today.
-                    <br>
-                    Add your items to your dashboard and see what is going on in your storage facility
-                </p>
-                
-                <a href="{{ url_for('facilities') }}" class="btn">Item Management</a>
-                <div class="second-section">
-                    <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
-                    <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="1500">
-                    <img src="../static/images/1.png" width="1000">
-                </div>
-                </div>
-			</div>
-            {% else %}
-        </div>
-            <div class="container">
-                <h2>Welcome To Kurikirana</h2>
-                <div class="pcontainer">
-                    <p>Kurikirana helps you track your food across the world and give you real-time insights on its conditions</p>
-                </div>
-                <div class="second-section">
-                    <a href="{{ url_for('register') }}" class="btn">Get Started</a>
-                    <a href="{{ url_for('aboutus') }}" class="btn">About us</a>
-                </div>
-            </div>
-            
-            <div class="second-section">
-                <p>Get insights on how your products are doing and exactly pinpoint their precise location</p>
-                <div class="banner_image aos-init aos-animate" data-aos="fade-up" data-aos-duration="500">
-                <img src="../static/images/2.png" width="1000"></div>
-                </div>
-            
-        </main>
-        <footer>
-            <p>&copy; 2025 Kurikirana</p>
-        </footer>
-    </div>
-        {% endif %}
-</body>
-    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-        <script>
-        AOS.init();
-        </script>
-    <script>
-    let logoutTimer;
-  
-    function startLogoutTimer() {
-      logoutTimer = setTimeout(logout, 24 * 60 * 60 * 1000); // 24 hours in milliseconds
-    }
-  
-    function resetLogoutTimer() {
-      clearTimeout(logoutTimer);
-      startLogoutTimer();
-    }
-  
-    function logout() {
-      window.location.href = '/logout';
-    }
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Kurikirana</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<!-- <link rel="stylesheet" href="assets/css/main.css" /> -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+	</head>
+	<body class="is-preload">
 
-    function handlePageClose() {
-      resetLogoutTimer();
-      logout(); // Perform logout when the page is closed
-    }
-  
-    // Attach event listeners to reset the timer on user activity
-    document.addEventListener('mousemove', resetLogoutTimer);
-    document.addEventListener('keypress', resetLogoutTimer);
-  
-    // Start the initial timer when the page loads
-    startLogoutTimer();
-    // Handle the beforeunload event to logout when the page is closed
-    window.addEventListener('beforeunload', function (event) {
-        // You may want to add a confirmation message here
-        logout();
-    })
-  </script>
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<div id="main">
+						<div class="inner">
+
+							<!-- Header -->
+								<header id="header">
+									<a href="{{ url_for('index') }}" class="logo"><strong>Kurikirana</strong></a>
+									<ul class="icons">
+                                        {% if current_user.is_authenticated or session['google_user'] %}
+                                        <a href="{{ url_for('logout') }}"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                                        {% else %}
+                                        <li></li><span class="label"><a href="{{ url_for('login') }}">Login</span></a></li>
+                                        <li></li><span class="label"><a href="{{ url_for('register') }}">Register</span></a></li>
+										{% endif %}
+							
+										<!-- <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+										<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+										<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a></li>
+										<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+										<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li> -->
+									</ul>
+								</header>
+
+							<!-- Banner -->
+								<section id="banner">
+									<div class="content">
+										<header>
+											<h1>Welcome<br />
+											to Kurikirana</h1>
+											<p>Solve your storage issues today</p>
+										</header>
+										<p>Kurikirana is a platform that allows you to track the humidity and temperature of your storage facilities. Monitor your storage facilities remotely and know what is going on in real-time.</p>
+										<ul class="actions">
+											<li><a href="{{ url_for('aboutus') }}" class="button big">Learn More</a></li>
+										</ul>
+									</div>
+									<span class="image object">
+										<img src="/static/images/3.png" alt="" />
+									</span>
+								</section>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Why Temperature and Humidity?</h2>
+									</header>
+									<div class="features">
+										<article>
+											<span class="icon fa-trash-can"></span>
+											<div class="content">
+												<h3>Food Waste</h3>
+												<p>14% of food produced for human consumption is lost between harvest and retail, according to the Food and Agriculture Organization. This may not look as much in percentage but this represents 1.3 billion tons of food every year.</p>
+											</div>
+										</article>
+										<article>
+											<span class="icon solid fa-thermometer-half"></span>
+											<div class="content">
+												<h3>Temperature</h3>
+												<p>Improper temperature control is one of the main causes of premature food spoilage, especially during storage and transportation. Most food items are highly sensitive to temperature fluctuations.</p>
+											</div>
+										</article>
+										<article>
+											<span class="icon solid fa-droplet"></span>
+											<div class="content">
+												<h3>Humidity</h3>
+												<p>Maintaining the correct humidity level in storage environments is essential for preserving food quality. Too much moisture can lead to mold and spoilage, while too little can cause dehydration and loss of freshness.</p>
+											</div>
+										</article>
+										<article>
+											<span class="icon solid fa-signal"></span>
+											<div class="content">
+												<h3>Real-Time Monitoring</h3>
+												<p>Real-time monitoring of temperature and humidity in storage facilities is crucial to prevent spoilage. Using sensors to ensure that any fluctuations are immediately addressed, helping preserve food quality and reduce waste.</p>
+											</div>
+										</article>
+									</div>
+								</section>
+
+							<!-- Section -->
+								<section>
+									<header class="major">
+										<h2>Unique Features</h2>
+									</header>
+									<div class="posts">
+										<article>
+											<a href="#" class="image"><img src="/static/images/3.png" alt="" /></a>
+											<h3>Humidity Monitoring</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="/static/images/4.png" alt="" /></a>
+											<h3>Alerts</h3>
+											<p>Recieve alerts personalized to your items evertime the temperature or humidity reaches alarming level.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="/static/images/1.png" alt="" /></a>
+											<h3>Humidity Monitoring</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+										<article>
+											<a href="#" class="image"><img src="/static/images/2.png" alt="" /></a>
+											<h3>Nulla amet dolore</h3>
+											<p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+											<ul class="actions">
+												<li><a href="#" class="button">More</a></li>
+											</ul>
+										</article>
+									</div>
+								</section>
+								<section id="banner">
+									<div class="content">
+										<header>
+											<h1>Benefits of Kurikirana</h1>
+										</header>
+										<ul>
+											<li> Prevent unnecessary waste by monitoring temperature and humidity in real-time.</li>
+											<li> Reduce spoilage by detecting unfavorable conditions early.</li>
+											<li> Minimize operational costs by optimizing storage conditions.</li>
+											<li> Receive instant alerts when critical temperature or humidity levels are reached.</li>
+											<li> Improve food preservation by ensuring ideal storage conditions are maintained.</li>
+											<li> Increase the shelf life of stored food products through proper monitoring.</li>
+										</ul>
+									</div>
+									<span class="image object">
+										<img src="/static/images/5.png" alt="" />
+									</span>
+								</section>
+						</div>
+					</div>
+
+				<!-- Sidebar -->
+					<div id="sidebar">
+						<div class="inner">
+
+							<!-- Search -->
+								<!-- <section id="search" class="alt">
+									<form method="post" action="#">
+										<input type="text" name="query" id="query" placeholder="Search" />
+									</form>
+								</section> -->
+
+							<!-- Menu -->
+								<nav id="menu">
+									<header class="major">
+										<h2>Menu</h2>
+									</header>
+									<ul>
+                                        {% if current_user.is_authenticated or session['google_user'] %}
+										<li><a href="{{ url_for('index') }}">Homepage</a></li>
+										<!-- <li><a href="{{ url_for('generic') }}">Generic</a></li> -->
+                                        <li><a href="{{ url_for('facilities')}}">Facilities Management</a>
+										<li>
+											<span class="opener">Facilities</span>
+											<ul>
+												<li><a href="#">Bishyenyi</a></li>
+												<li><a href="#">Kigali</a></li>
+												<li><a href="#">Gikondo</a></li>
+											</ul>
+                                            {% else %}
+                                            <li><a href="{{ url_for('index') }}">Homepage</a></li>
+                                            {% endif %}
+										</li>
+										<li><a href="{{ url_for('aboutus') }}">About Us</a></li>
+										<li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+                                        {% if current_user.is_authenticated or session['google_user'] %}
+                                        <li><a href="{{ url_for('logout') }}">
+                                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                                        </a></li>
+                                        {% endif %}
+									</ul>
+								</nav>
+						</div>
+					</div>
+
+			</div>
+		<!-- Scripts -->
+			<script src="static/js/jquery.min.js"></script>
+			<script src="https://kit.fontawesome.com/6c9e56babf.js" crossorigin="anonymous"></script>
+			<script src="/static/js/browser.min.js"></script>
+			<script src="/static/js/breakpoints.min.js"></script>
+			<script src="/static/js/util.js"></script>
+            <script src="/static/js/main.js"></script>
+            <!-- <footer>
+                <p>&copy; 2025 Kurikirana</p>
+            </footer> -->
+	</body>
 </html>

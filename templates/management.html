@@ -53,6 +53,7 @@
                     </div>
                   </div>
                 </li>
+                <li><a href="{{ url_for('inventory', facility_id=facility_id) }}">Inventory</a></li>
                 <li><a href="{{ url_for('contact')}}">Contact Us</a></li>
                 <li><a href="{{ url_for('aboutus')}}">About Us</a></li>
                 <a href="{{ url_for('logout') }}">
@@ -95,6 +96,8 @@
                 <i class="fa fa-close" onclick="closePopup()"></i> 
                 
                 <form id="foodForm" method="post" enctype="multipart/form-data">
+                    <h3> New Food Item </h3> 
+                    <br>
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
                         {{ form.food_name.label }}
@@ -120,6 +123,28 @@
                         {{ form.expiration_date.label }}
                         {{ form.expiration_date(class="form-control") }}
                     </div>
+                    <br>
+                    <div class="mb-3">
+                        {{ form.unit.label }}
+                        {{ form.unit(class="form-control") }}
+                    </div>
+                    <br>
+                    <div class="mb-3">
+                        {{ form.quantity.label }}
+                        {{ form.quantity(class="form-control") }}
+                    </div>
+                    <br>
+                    <div class="mb-3">
+                        {{ form.unit_price.label }}
+                        {{ form.unit_price(class="form-control") }}
+                    </div>
+                    <br>
+                    <div class="mb-3">
+                        {{ form.min_stock.label }}
+                        {{ form.min_stock(class="form-control") }}
+                    </div>
+                    <br>
+                    <br>
                     <div class="mb-3">
                         {{ form.submit(class="btn btn-primary") }}
                     </div>

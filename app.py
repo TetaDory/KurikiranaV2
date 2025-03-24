@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime, timedelta
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField
+from wtforms import StringField, SubmitField, DateField, IntegerField, FloatField
 from wtforms.validators import DataRequired
 from sqlalchemy.dialects import postgresql
 from flask_oauthlib.client import OAuth, OAuthException
@@ -72,8 +72,12 @@ class PostForm(FlaskForm):
     batch_number = StringField('Batch Number', validators=[DataRequired()])
     optimum_temperature = StringField('Optimum Temperature (°C)', validators=[DataRequired()])
     optimum_humidity = StringField('Optimum Humidity (g/kg)', validators=[DataRequired()])
-    # expiration_date = StringField('Expiration Date', validators=[DataRequired()])
-    expiration_date = DateField('Expiration Date', render_kw={"type": "date"})
+    expiration_date = DateField('Expiration Date', format='%Y-%m-%d')
+    unit = StringField('Unit of Measurement', validators=[DataRequired()])
+    quantity = IntegerField('Quantity', default=0)
+    unit_price = FloatField('Unit Price', default=0.0)
+    min_stock = IntegerField("Initial Stock", default = 0)
+    # supplier = StringField('Supplier', validators=[DataRequired()])
     submit = SubmitField('Add Item')
 
 class Post(db.Model):
@@ -82,13 +86,17 @@ class Post(db.Model):
     batch_number = db.Column(db.String(100), nullable=False)
     optimum_temperature = db.Column(db.String(100), nullable=False)
     optimum_humidity = db.Column(db.String(100), nullable=False)
-    # expiration_date = db.Column(db.String(100), nullable=False)
     expiration_date = db.Column(db.Date())
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     facility_id = db.Column(db.Integer, db.ForeignKey('facility.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('posts', lazy=True))
     facility = db.relationship('Facility', backref=db.backref('posts', lazy=True))
+    quantity = db.Column(db.Integer, default=0)
+    unit_price = db.Column(db.Float, default=0.0)
+    unit = db.Column(db.String(50), nullable=True)
+    # supplier = db.Column(db.String(200), nullable=True)
+    min_stock = db.Column(db.Integer, default = 0)
 
 class FoodItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -114,7 +122,17 @@ class Facility(db.Model):
 
     def __repr__(self):
         return f"Facility('{self.facility_name}')"
-    
+
+class QuantityAdjustment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    quantity_change = db.Column(db.Integer, nullable=False)
+    # supplier = db.Column(db.String(200), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    action = db.Column(db.String(10), nullable=False)  # 'add' or 'remove'
+    location = db.Column(db.String(200), nullable=True)
+    destination = db.Column(db.String(200), nullable=True)
+    item = db.relationship('Post', backref=db.backref('adjustments', lazy=True))  
 # Initialize Flask-Login
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -228,6 +246,10 @@ def index():
     google_user = session.get('google_user')
     return render_template('index.html', google_user=google_user)
 
+@app.route('/generic')
+def generic():
+    return render_template('generic.html')
+
 @app.route('/post', methods=['GET', 'POST'])
 # @login_required
 def post():
@@ -302,6 +324,94 @@ def delete_facility(facility_id):
 def dashboard():
     return render_template('dashboard.html', current_user=current_user)
 
+@app.route('/inventory/<int:facility_id>', methods=['GET', 'POST'])
+def inventory(facility_id):
+    form = PostForm()
+    facility = Facility.query.get_or_404(facility_id)
+
+    if request.method == 'POST' and form.validate_on_submit():
+        # Extract data from the form
+        food_name = form.food_name.data
+        batch_number = form.batch_number.data
+        optimum_temperature = form.optimum_temperature.data
+        optimum_humidity = form.optimum_humidity.data
+        expiration_date = form.expiration_date.data
+        quantity = form.quantity.data
+        unit_price = form.unit_price.data
+        unit = form.unit.data
+        min_stock = form.min_stock.data
+        
+        facility_id=facility_id
+
+        # Create a new post instance
+        new_post = Post(
+            food_name=food_name,
+            batch_number=batch_number,
+            optimum_temperature=optimum_temperature,
+            optimum_humidity=optimum_humidity,
+            expiration_date=expiration_date,
+            quantity=quantity,
+            unit_price=unit_price,
+            unit=unit,
+            min_stock=min_stock,
+            user_id=current_user.id,
+            facility_id=facility_id
+        )
+        db.session.add(new_post)
+        db.session.commit()
+
+        # Retrieve all Food Names from the database filtered by facility
+        all_food_names = Post.query.filter_by(facility_id=facility_id).all()
+        all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
+        all_quantity = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit = Post.query.filter_by(facility_id=facility_id).all()
+        all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
+
+        # Pass the list of Food Names to the template
+        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, quantity=all_quantity, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+    else:
+        # Retrieve all Food Names from the database filtered by facility
+        all_food_names = Post.query.filter_by(facility_id=facility_id).all()
+        all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
+        all_quantity = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit = Post.query.filter_by(facility_id=facility_id).all()
+        all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
+
+        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, quantity=all_quantity, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+
+@app.route('/quantity_logs/<int:facility_id>')
+def quantity_logs(facility_id):
+    logs = QuantityAdjustment.query.join(Post).filter(Post.facility_id == facility_id).order_by(QuantityAdjustment.timestamp.desc()).all()
+    return render_template('quantity_logs.html', logs=logs, facility_id=facility_id)
+
+@app.route('/adjust_quantity/<int:facility_id>', methods=['POST'])
+def adjust_quantity(facility_id):
+    item_id = int(request.form['item_id'])
+    item = Post.query.get_or_404(item_id)
+    action = request.form['action']
+    quantity_change = int(request.form['quantity_change'])
+    location = request.form.get('location', None)
+    destination = request.form.get('destination', None)
+
+    if action == 'add':
+        item.quantity += quantity_change
+    elif action == 'remove':
+        if item.quantity >= quantity_change:
+            item.quantity -= quantity_change
+        else:
+            flash("Cannot remove more quantity than available.", 'danger')
+
+    db.session.commit()
+    return redirect(url_for('inventory', facility_id=facility_id))
+
 @app.route('/management/<int:facility_id>', methods=['GET', 'POST'])
 # @login_required
 def management(facility_id):
@@ -315,6 +425,11 @@ def management(facility_id):
         optimum_temperature = form.optimum_temperature.data
         optimum_humidity = form.optimum_humidity.data
         expiration_date = form.expiration_date.data
+        quantity = form.quantity.data
+        unit_price = form.unit_price.data
+        unit = form.unit.data
+        min_stock = form.min_stock.data
+        facility_id=facility_id
 
         # Create a new post instance
         new_post = Post(
@@ -323,14 +438,14 @@ def management(facility_id):
             optimum_temperature=optimum_temperature,
             optimum_humidity=optimum_humidity,
             expiration_date=expiration_date,
+            quantity=quantity,
+            unit_price=unit_price,
+            unit=unit,
+            min_stock=min_stock,
             user_id=current_user.id,
-            facility_id=facility_id # Add this line
+            facility_id=facility_id
         )
-
-        # Add the new post to the database session
         db.session.add(new_post)
-
-        # Commit the changes to the database
         db.session.commit()
 
         # Retrieve all Food Names from the database filtered by facility
@@ -339,9 +454,13 @@ def management(facility_id):
         all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
         all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
+        all_quantity = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit = Post.query.filter_by(facility_id=facility_id).all()
+        all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
         # Pass the list of Food Names to the template
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, quantity=all_quantity, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
     else:
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
@@ -349,8 +468,12 @@ def management(facility_id):
         all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
         all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
+        all_quantity = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
+        all_unit = Post.query.filter_by(facility_id=facility_id).all()
+        all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, quantity=all_quantity, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
 
 @app.route('/tempreport')
 # @login_required
@@ -488,10 +611,11 @@ def edit_food(id):
 # @login_required
 def delete_food(id):
     food_item = Post.query.get_or_404(id) #change from FoodItem to Post
+    facility_id = food_item.facility_id
     db.session.delete(food_item)
     db.session.commit()
     flash('Food item deleted successfully!', 'success')
-    return redirect(url_for('management'))
+    return redirect(url_for('management', facility_id=facility_id))
 
 @app.route('/export_excel/<int:item_id>')
 def export_excel(item_id):

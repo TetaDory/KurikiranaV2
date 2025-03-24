@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facility Selection</title>
+    <link rel="stylesheet" href="../static/css/facilities.css">
+    <!-- <link rel="stylesheet" href="../static/css/main.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Select a Facility</h2>
+        <div class="facility-list">
+        {% for facility in facilities %}
+            <div class="facility-item">
+                <span>{{ facility.facility_name }}</span>
+                    <a href="{{ url_for('management', facility_id=facility.id) }}">Select</a>
+                    <form action="{{ url_for('delete_facility', facility_id=facility.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="delete" onclick="return confirm('Are you sure you want to delete this facility?')">Delete</button>
+                    </form>
+            </div>
+        {% endfor %}
+    </div>
+    <button onclick="openPopup()">Add New Facility</button>
+    <div class="popup" id="popup">
+        <i class="fa fa-close" onclick="closePopup()"></i>
+        <form id="facilityForm" method="post" action="{{ url_for('add_facility') }}">
+        <br>
+        <div class="mb-3">
+        <label for="facilityName">Facility Name:</label>
+        <input type="text" id="facilityName" name="facilityName" required>
+        </div>
+        <br>
+        <div class="mb-3">
+        <label for="facilityName">Location:</label>
+        <input type="text" id="facilityLocation" name="facilityLocation" required>
+        </div>
+        <br>
+        <button type="submit">Add Facility</button>
+        </form>
+    </div>
+    </div>
+    <script>
+    let facilityPopup = document.getElementById("popup");
+    function openPopup() {
+                facilityPopup.classList.add("open-popup");
+            }
+            function closePopup() {
+                facilityPopup.classList.remove("open-popup");
+            }
+        </script>
+</body>
+</html>
