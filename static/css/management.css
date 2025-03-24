@@ -193,11 +193,8 @@ ul li a {
     padding-top: 80px;
 }
 
-header{
-    align-items: center;
-}
-
 header {
+    align-items: center;
     display: flex;
     align-items: center; /* Center vertically */
     background-color: var(--primary-color);

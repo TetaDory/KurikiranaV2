@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 card.appendChild(header);
 
                 const maxTemp = document.createElement("p");
-                maxTemp.textContent = `Maximum Humidity: ${item.max_temp}g/kg`;
+                maxTemp.textContent = `Optimum Humidity: ${item.max_temp}g/kg`;
                 card.appendChild(maxTemp);
 
                 const alertsList = document.createElement("ul");

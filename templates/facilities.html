@@ -3,13 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facility 1  Selection</title>
+    <title>Facility Selection</title>
     <link rel="stylesheet" href="../static/css/facilities.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
-        <h1>Kurikirana</h1> 2 
+        <div class="header-left">
+            <h1>Kurikirana</h1>
+        </div>
+        <div class="header-center">
+            <div class="post-header">
+                
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="dropdown">
+                <button class="dropbtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="dropdown-content">
+                    {% if current_user.is_authenticated or session['google_user'] %}
+                        <a href="{{ url_for('index') }}">Home</a>
+                        <a href="{{ url_for('aboutus') }}">About Us</a>
+                        <a href="{{ url_for('contact') }}">Contact Us</a>
+                        <a href="{{ url_for('logout') }}">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">Login</a>
+                        <a href="{{ url_for('register') }}">Register</a>
+                        <a href="#">About us</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </header>
     <div class="container">
         <h2>Select a Facility</h2>
@@ -24,23 +52,31 @@
             </div>
         {% endfor %}
     </div>
-    <button onclick="openFacilityPopup()">Add New Facility</button>
-    <div class="popup" id="facilityPopup">
-        <i class="fa fa-close" onclick="closeFacilityPopup()"></i>
+    <button onclick="openPopup()">Add New Facility</button>
+    <div class="popup" id="popup">
+        <i class="fa fa-close" onclick="closePopup()"></i>
         <form id="facilityForm" method="post" action="{{ url_for('add_facility') }}">
+        <br>
+        <div class="mb-3">
         <label for="facilityName">Facility Name:</label>
         <input type="text" id="facilityName" name="facilityName" required>
+        </div>
+        <br>
+        <div class="mb-3">
+        <label for="facilityName">Location:</label>
+        <input type="text" id="facilityLocation" name="facilityLocation" required>
+        </div>
+        <br>
         <button type="submit">Add Facility</button>
         </form>
     </div>
     </div>
     <script>
-    let facilityPopup = document.getElementById("facilityPopup");
-    function openFacilityPopup() {
+    let facilityPopup = document.getElementById("popup");
+    function openPopup() {
                 facilityPopup.classList.add("open-popup");
             }
-
-            function closeFacilityPopup() {
+            function closePopup() {
                 facilityPopup.classList.remove("open-popup");
             }
         </script>

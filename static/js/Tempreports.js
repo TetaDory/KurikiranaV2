@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 card.appendChild(header);
 
                 const maxTemp = document.createElement("p");
-                maxTemp.textContent = `Maximum Temperature: ${item.max_temp}°C`;
+                maxTemp.textContent = `optimum Temperature: ${item.max_temp}°C`;
                 card.appendChild(maxTemp);
 
                 const alertsList = document.createElement("ul");

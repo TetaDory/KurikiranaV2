@@ -43,11 +43,58 @@ ul li a {
   font-weight: bold;
 }
 
+.header {
+  color: black;
+  padding: 15px;
+  text-align: center;
+  font-size: 24px;
+  border-radius: 5px;
+  margin-bottom: 20px; 
+  padding-top: 80px;
+}
+
 header {
+  align-items: center;
+  padding: 2px 2px;
+  display: flex;
+  align-items: center; /* Center vertically */
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0px 10px;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.header-left {
+  flex: 1; /* Takes up available space on the left */
+}
+
+.header-center {
+  text-align: center; /* Center the text within */
+  flex: 2; /* Takes up more space in the center */
+}
+
+.header-right {
+  flex: 1; /* Takes up available space on the right */
+  display: flex;
+  justify-content: flex-end; /* Align to the right */
+}
+
+.post-header h3 {
+  margin: 0; /* Reset default margins */
+}
+
+h3{
+  text-align: center;
+}
+
+/* header {
   display: flex;
   background-color: var(--primary-color);
   color: #fff;
-  padding: 10px 10px;
+  padding: 2px 2px;
   text-align: left;
   position: fixed;
   top: 0;
@@ -59,7 +106,7 @@ header h1 {
   font-size: 30px;
   margin: 0;
   flex: 1;
-}
+} */
 
 nav {
   display: flex;

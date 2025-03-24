@@ -1,90 +1,90 @@
 $(document).ready(function() {
-    // Array to store food items
-    var foodItems =;
+    // Array to store locations
+    var locations =;
   
-    // Function to add a new food item
-    function addItem(name, description) {
-      const newItem = {
+    // Function to add a new food facility
+    function addfacility(name, description) {
+      const newfacility = {
         id: Date.now(), // Generate a unique ID
         name: name,
         description: description
       };
-      foodItems.push(newItem);
-      renderItems();
+      locations.push(newfacility);
+      renderfacilities();
     }
   
-    // Function to edit an existing food item
-    function editItem(id, name, description) {
-      const itemIndex = foodItems.findIndex(item => item.id === id);
-      if (itemIndex !== -1) {
-        foodItems[itemIndex] = { id, name, description };
-        renderItems();
+    // Function to edit an existing food facility
+    function editfacility(id, name, description) {
+      const facilityIndex = locations.findIndex(facility => facility.id === id);
+      if (facilityIndex !== -1) {
+        locations[facilityIndex] = { id, name, description };
+        renderfacilities();
       }
     }
   
-    // Function to delete a food item
-    function deleteItem(id) {
-      foodItems = foodItems.filter(item => item.id !== id);
-      renderItems();
+    // Function to delete a food facility
+    function deletefacility(id) {
+      locations = locations.filter(facility => facility.id !== id);
+      renderfacilitiess();
     }
   
-    // Function to render the food items list
-    function renderItems() {
-      const foodItemsList = $("#foodItemsList");
-      foodItemsList.empty(); // Clear the list
+    // Function to render the food facilities list
+    function renderfacilities() {
+      const locationsList = $("#locationsList");
+      locationsList.empty(); // Clear the list
   
-      foodItems.forEach(item => {
-        const listItem = $("<li>");
-        listItem.html(`
-          ${item.name} - ${item.description}
-          <button class="edit-btn" data-item-id="${item.id}">Edit</button>
-          <button class="delete-btn" data-item-id="${item.id}">Delete</button>
+      locations.forEach(facility => {
+        const listfacility = $("<li>");
+        listfacility.html(`
+          ${facility.name} - ${facility.description}
+          <button class="edit-btn" data-facility-id="${facility.id}">Edit</button>
+          <button class="delete-btn" data-facility-id="${facility.id}">Delete</button>
         `);
-        foodItemsList.append(listItem);
+        locationsList.append(listfacility);
       });
     }
   
-    // Add item
-    $("#addItemBtn").click(function() {
-      $("#addItemModal").show();
+    // Add facility
+    $("#addfacilityBtn").click(function() {
+      $("#addfacilityModal").show();
     });
   
-    $("#addItemForm").submit(function(event) {
+    $("#addfacilityForm").submit(function(event) {
       event.preventDefault();
-      const name = $("#itemName").val();
-      const description = $("#itemDescription").val();
-      addItem(name, description);
-      $("#addItemModal").hide();
-      $("#addItemForm")[0].reset(); // Clear the form
+      const name = $("#facilityName").val();
+      const description = $("#facilityDescription").val();
+      addfacility(name, description);
+      $("#addfacilityModal").hide();
+      $("#addfacilityForm")[0].reset(); // Clear the form
     });
   
-    // Edit item
-    $("#foodItemsList").on("click", ".edit-btn", function() {
-      const itemId = $(this).data("item-id");
-      const item = foodItems.find(item => item.id === itemId);
-      $("#editItemName").val(item.name);
-      $("#editItemDescription").val(item.description);
-      $("#editItemModal").show();
+    // Edit facility
+    $("#locationsList").on("click", ".edit-btn", function() {
+      const facilityId = $(this).data("facility-id");
+      const facility = locations.find(facility => facility.id === facilityId);
+      $("#editfacilityName").val(facility.name);
+      $("#editfacilityDescription").val(facility.description);
+      $("#editfacilityModal").show();
   
-      // Update the item when the edit form is submitted
-      $("#editItemForm").submit(function(event) {
+      // Update the facility when the edit form is submitted
+      $("#editfacilityForm").submit(function(event) {
         event.preventDefault();
-        const name = $("#editItemName").val();
-        const description = $("#editItemDescription").val();
-        editItem(itemId, name, description);
-        $("#editItemModal").hide();
-        $("#editItemForm")[0].reset(); // Clear the form
+        const name = $("#editfacilityName").val();
+        const description = $("#editfacilityDescription").val();
+        editfacility(facilityId, name, description);
+        $("#editfacilityModal").hide();
+        $("#editfacilityForm")[0].reset(); // Clear the form
       });
     });
   
-    // Delete item
-    $("#foodItemsList").on("click", ".delete-btn", function() {
-      const itemId = $(this).data("item-id");
-      $("#deleteItemModal").show();
+    // Delete facility
+    $("#locationsList").on("click", ".delete-btn", function() {
+      const facilityId = $(this).data("facility-id");
+      $("#deletefacilityModal").show();
   
       $("#confirmDeleteBtn").click(function() {
-        deleteItem(itemId);
-        $("#deleteItemModal").hide();
+        deletefacility(facilityId);
+        $("#deletefacilityModal").hide();
       });
     });
   

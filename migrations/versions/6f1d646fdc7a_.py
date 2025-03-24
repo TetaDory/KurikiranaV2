@@ -1,8 +1,8 @@
-"""Initial migration: User, Facility, Post tables
+"""empty message
 
-Revision ID: 21c9415e732b
+Revision ID: 6f1d646fdc7a
 Revises: 
-Create Date: 2025-03-21 11:03:28.670549
+Create Date: 2025-03-24 10:30:57.373710
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '21c9415e732b'
+revision = '6f1d646fdc7a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,6 +21,7 @@ def upgrade():
     op.create_table('facility',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('facility_name', sa.String(length=100), nullable=False),
+    sa.Column('facility_location', sa.String(length=100), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('food_item',
@@ -28,6 +29,7 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('optimum_temperature', sa.String(length=50), nullable=False),
     sa.Column('optimum_humidity', sa.String(length=50), nullable=False),
+    sa.Column('expiration_date', sa.String(length=50), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user',
@@ -43,8 +45,9 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('food_name', sa.String(length=200), nullable=False),
     sa.Column('batch_number', sa.String(length=100), nullable=False),
-    sa.Column('maximum_temperature', sa.String(length=100), nullable=False),
-    sa.Column('maximum_humidity', sa.String(length=100), nullable=False),
+    sa.Column('optimum_temperature', sa.String(length=100), nullable=False),
+    sa.Column('optimum_humidity', sa.String(length=100), nullable=False),
+    sa.Column('expiration_date', sa.String(length=100), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('facility_id', sa.Integer(), nullable=False),

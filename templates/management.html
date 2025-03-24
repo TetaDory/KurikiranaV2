@@ -67,17 +67,18 @@
                 <tr>
                     <th>Food Name</th>
                     <th>Batch Number</th>
-                    <th>Maximum Temperature (°C)</th>
-                    <th>Maximum Humidity (g/kg)</th>
+                    <th>Optimum Temperature (°C)</th>
+                    <th>Optimum Humidity (g/kg)</th>
+                    <th>Expiration Date (g/kg)</th>
                     <th>Actions</th>
-                        <a href="{{ url_for('dashboard', item_id=post_id) }}">Dashboard</a>
                 </tr>
                 {% for post in posts %}
                 <tr>
                     <td>{{ post.food_name }}</td>
                     <td>{{ post.batch_number }}</td>
-                    <td>{{ post.maximum_temperature }}</td>
-                    <td>{{ post.maximum_humidity }}</td>
+                    <td>{{ post.optimum_temperature }}</td>
+                    <td>{{ post.optimum_humidity }}</td>
+                    <td>{{ post.expiration_date }}</td>
                     <td>
                         <a href="{{ url_for('dashboard', item_id=post.id) }}">Dashboard</a>
                         <!-- <a href="{{ url_for('edit_food', id=post.id) }}">Edit</a> -->
@@ -106,23 +107,24 @@
                     </div>
                     <br>
                     <div class="mb-3">
-                        {{ form.maximum_temperature.label }}
-                        {{ form.maximum_temperature(class="form-control") }}
+                        {{ form.optimum_temperature.label }}
+                        {{ form.optimum_temperature(class="form-control") }}
                     </div>
                     <br>
                     <div class="mb-3">
-                        {{ form.maximum_humidity.label }}
-                        {{ form.maximum_humidity(class="form-control") }}
+                        {{ form.optimum_humidity.label }}
+                        {{ form.optimum_humidity(class="form-control") }}
                     </div>
                     <br>
+                    <div class="mb-3">
+                        {{ form.expiration_date.label }}
+                        {{ form.expiration_date(class="form-control") }}
+                    </div>
                     <div class="mb-3">
                         {{ form.submit(class="btn btn-primary") }}
                     </div>
                 </form>
             </div>
-        </div>
-        <div class="container">
-            
         </div>
     <footer>
             <p>&copy; 2025 Kurikirana</p>
@@ -143,7 +145,7 @@
             const foodName = document.getElementById("foodName").value;
             const optimumTemperature = document.getElementById("optimumTemperature").value;
             const optimumHumidity = document.getElementById("optimumHumidity").value;
-            // Basic validation (you can add more robust validation)
+            // Basic validation
             if (!foodName || isNaN(optimumTemperature) || isNaN(optimumHumidity)) {
                 alert("Please fill in all fields with valid numbers.");
                 return;

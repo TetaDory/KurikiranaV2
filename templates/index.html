@@ -14,27 +14,34 @@
 <body>
     <div class="background-container">
         <header>
-            <h1>Kurikirana</h1>
-            <div class="dropdown">
-                <button class="dropbtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="dropdown-content">
-                    {% if current_user.is_authenticated or session['google_user'] %}
-                        <a href="{{ url_for('facilities') }}">Item Management</a>
-                        <!-- <a href="{{ url_for('dashboard') }}">Dashboard</a> -->
+            <div class="header-left">
+                <h1>Kurikirana</h1>
+            </div>
+            <div class="header-center">
+                <div class="post-header">
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        {% if current_user.is_authenticated or session['google_user'] %}
+                        <a href="{{ url_for('facilities') }}">Item Management</a>                        
                         <a href="{{ url_for('aboutus') }}">About Us</a>
                         <a href="{{ url_for('contact') }}">Contact</a>
                         <a href="{{ url_for('logout') }}">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    </a>
+                        </a>
                     {% else %}
                         <a href="{{ url_for('login') }}">Login</a>
                         <a href="{{ url_for('register') }}">Register</a>
                         <a href="{{ url_for('aboutus') }}">About us</a>
                     {% endif %}
+                    </div>
                 </div>
-            </div>  
+            </div>
         </header>
         <main>
             {% if current_user.is_authenticated or session['google_user'] %}

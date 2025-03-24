@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from datetime import datetime, timedelta
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, DateField
 from wtforms.validators import DataRequired
 from sqlalchemy.dialects import postgresql
 from flask_oauthlib.client import OAuth, OAuthException
@@ -70,16 +70,20 @@ class User(UserMixin, db.Model):
 class PostForm(FlaskForm):
     food_name = StringField('Food Name', validators=[DataRequired()])
     batch_number = StringField('Batch Number', validators=[DataRequired()])
-    maximum_temperature = StringField('Maximum Temperature (°C)', validators=[DataRequired()])
-    maximum_humidity = StringField('Maximum Humidity (g/kg)', validators=[DataRequired()])
+    optimum_temperature = StringField('Optimum Temperature (°C)', validators=[DataRequired()])
+    optimum_humidity = StringField('Optimum Humidity (g/kg)', validators=[DataRequired()])
+    # expiration_date = StringField('Expiration Date', validators=[DataRequired()])
+    expiration_date = DateField('Expiration Date', render_kw={"type": "date"})
     submit = SubmitField('Add Item')
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     food_name = db.Column(db.String(200), nullable=False)
     batch_number = db.Column(db.String(100), nullable=False)
-    maximum_temperature = db.Column(db.String(100), nullable=False)
-    maximum_humidity = db.Column(db.String(100), nullable=False)
+    optimum_temperature = db.Column(db.String(100), nullable=False)
+    optimum_humidity = db.Column(db.String(100), nullable=False)
+    # expiration_date = db.Column(db.String(100), nullable=False)
+    expiration_date = db.Column(db.Date())
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     facility_id = db.Column(db.Integer, db.ForeignKey('facility.id'), nullable=False)
@@ -91,19 +95,22 @@ class FoodItem(db.Model):
     name = db.Column(db.String(100), nullable=False)
     optimum_temperature = db.Column(db.String(50), nullable=False)
     optimum_humidity = db.Column(db.String(50), nullable=False)
+    expiration_date = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
-        return f"FoodItem('{self.name}', '{self.optimum_temperature}', '{self.optimum_humidity}')"
+        return f"FoodItem('{self.name}', '{self.optimum_temperature}', '{self.optimum_humidity}'), '{self.expiration_date}')"
 
 class FoodItemForm(FlaskForm):
     name = StringField('Food Name', validators=[DataRequired()])
     optimum_temperature = StringField('Optimum Temperature', validators=[DataRequired()])
     optimum_humidity = StringField('Optimum Humidity', validators=[DataRequired()])
+    expiration_date = StringField('Expiration Date', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class Facility(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     facility_name = db.Column(db.String(100), nullable=False)
+    facility_location = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
         return f"Facility('{self.facility_name}')"
@@ -230,15 +237,17 @@ def post():
         # Extract data from the form
         food_name = form.food_name.data
         batch_number = form.batch_number.data
-        maximum_temperature = form.maximum_temperature.data
-        maximum_humidity = form.maximum_humidity.data
+        optimum_temperature = form.optimum_temperature.data
+        optimum_humidity = form.optimum_humidity.data
+        expiration_date = form.expiration_date.data
 
         # Create a new post instance
         new_post = Post(
             food_name=food_name,
             batch_number=batch_number,
-            maximum_temperature=maximum_temperature,
-            maximum_humidity=maximum_humidity,
+            optimum_temperature=optimum_temperature,
+            optimum_humidity=optimum_humidity,
+            espiration_date=expiration_date,
             user_id=current_user.id
         )
 
@@ -258,11 +267,12 @@ def explore():
     # Retrieve all Food Names from the database
     all_food_names = Post.query.all()
     all_batch_number = Post.query.all()
-    all_maximum_temperature = Post.query.all()
-    all_maximum_humidity = Post.query.all()
+    all_optimum_temperature = Post.query.all()
+    all_optimum_humidity = Post.query.all()
+    all_expiration_date = Post.query.all()
 
     # Pass the list of Food Names to the template
-    return render_template('explore.html', posts=all_food_names, batch_number=all_batch_number, maximum_temperature=all_maximum_temperature, maximum_humidity=all_maximum_humidity)
+    return render_template('explore.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date)
 
 @app.route('/facilities')
 @login_required
@@ -274,7 +284,8 @@ def facilities():
 @login_required
 def add_facility():
     facility_name = request.form['facilityName']
-    new_facility = Facility(facility_name=facility_name)
+    facility_location = request.form['facilityLocation']
+    new_facility = Facility(facility_name=facility_name, facility_location=facility_location)
     db.session.add(new_facility)
     db.session.commit()
     return redirect(url_for('facilities'))
@@ -301,15 +312,17 @@ def management(facility_id):
         # Extract data from the form
         food_name = form.food_name.data
         batch_number = form.batch_number.data
-        maximum_temperature = form.maximum_temperature.data
-        maximum_humidity = form.maximum_humidity.data
+        optimum_temperature = form.optimum_temperature.data
+        optimum_humidity = form.optimum_humidity.data
+        expiration_date = form.expiration_date.data
 
         # Create a new post instance
         new_post = Post(
             food_name=food_name,
             batch_number=batch_number,
-            maximum_temperature=maximum_temperature,
-            maximum_humidity=maximum_humidity,
+            optimum_temperature=optimum_temperature,
+            optimum_humidity=optimum_humidity,
+            expiration_date=expiration_date,
             user_id=current_user.id,
             facility_id=facility_id # Add this line
         )
@@ -323,27 +336,26 @@ def management(facility_id):
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
         all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
-        all_maximum_temperature = Post.query.filter_by(facility_id=facility_id).all()
-        all_maximum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
 
         # Pass the list of Food Names to the template
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, maximum_temperature=all_maximum_temperature, maximum_humidity=all_maximum_humidity, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
     else:
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
         all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
-        all_maximum_temperature = Post.query.filter_by(facility_id=facility_id).all()
-        all_maximum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_temperature = Post.query.filter_by(facility_id=facility_id).all()
+        all_optimum_humidity = Post.query.filter_by(facility_id=facility_id).all()
+        all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
 
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, maximum_temperature=all_maximum_temperature, maximum_humidity=all_maximum_humidity, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
 
 @app.route('/tempreport')
 # @login_required
 def tempreport():
     return render_template('tempreport.html')
-
-@app.route('/manage_first_facility')
-def manage_first_facility():
     first_facility = Facility.query.first()
     if first_facility:
         return redirect(url_for('management', facility_id=first_facility.id))
@@ -370,7 +382,7 @@ def get_temperature_alerts():
 
     for post in posts:
         item_id = post.id
-        max_temp = float(post.maximum_temperature)
+        max_temp = float(post.optimum_temperature)
         item_data = data.get(item_id, {}) #replace data with database queries.
         temperatures = item_data.get('temperature', [])
 
@@ -396,7 +408,7 @@ def get_humidity_alerts():
 
     for post in posts:
         item_id = post.id
-        max_temp = float(post.maximum_humidity)
+        max_temp = float(post.optimum_humidity)
         item_data = data.get(item_id, {}) #replace data with database queries.
         humidities = item_data.get('humidity', [])
 
@@ -440,13 +452,15 @@ def add_food():
         new_food = FoodItem(
             name=form.name.data,
             optimum_temperature=form.optimum_temperature.data,
-            optimum_humidity=form.optimum_humidity.data
+            optimum_humidity=form.optimum_humidity.data,
+            expiration_date=form.expiration_date.data
         )
         db.session.add(new_food)
         db.session.commit()
         flash('Food item added successfully!', 'success')
         return redirect(url_for('managefood'))
     return render_template('add_food.html', form=form)
+
 
 @app.route('/managefood')
 # @login_required
@@ -462,8 +476,9 @@ def edit_food(id):
     if form.validate_on_submit():
         food_item.food_name = form.food_name.data
         food_item.batch_number = form.batch_number.data
-        food_item.maximum_temperature = form.maximum_temperature.data
-        food_item.maximum_humidity = form.maximum_humidity.data
+        food_item.optimum_temperature = form.optimum_temperature.data
+        food_item.optimum_humidity = form.optimum_humidity.data
+        food_item.expiration_date = form.expiration_date.data
         db.session.commit()
         flash('Food item updated successfully!', 'success')
         return redirect(url_for('management'))
