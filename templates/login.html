@@ -1,70 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Kurikirana</title>
 
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6.4.0-web/css/all.min.css') }}">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-        <link rel="stylesheet" href="css/icofont.min.css">
-        <link rel="stylesheet" href="css/animate.min.css">
-        <link rel="stylesheet" href="css/owl.carousel.min.css">
-        <link rel="stylesheet" href="href=css/bootstrap.min.css">
-        <script src="https://js.stripe.com/v3/"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurikirana - Login</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
 <body>
-    <!-- <header>
-        <h1>Kurikirana</h1>
-        <div class="dropdown">
-            <button class="dropbtn">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="dropdown-content">
-                {% if current_user.is_authenticated or session['google_user'] %}
-                    <a href="{{ url_for('index') }}">Home</a>
-                    <a href="{{ url_for('explore') }}">Explore</a>
-                    <a href="{{ url_for('logout') }}">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('index') }}">Home</a>
-                    <a href="{{ url_for('register') }}">Register</a>
-                    <a href="{{ url_for('aboutus') }}">About Us</a>
-                {% endif %}
-            </div>
-        </div>  
+    <!-- <header id="header">
+        <a href="{{ url_for('index') }}" class="logo">
+            <strong>Kurikirana</strong>
+        </a>
+        <ul class="icons">
+            {% if current_user.is_authenticated or session['google_user'] %}
+            <a href="{{ url_for('logout') }}">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+            {% else %}
+            <li></li>
+            <span class="label">
+                <a href="{{ url_for('login') }}">Login</a>
+            </span>
+            </li>
+            <li></li>
+            <span class="label">
+                <a href="{{ url_for('register') }}">Register</a>
+            </span>
+            </li>
+            {% endif %}
+        </ul>
     </header> -->
     <div class="container">
         <div class="image-column">
             <a href="#" class="image"><img src="/static/images/6.png" alt="" /></a>
         </div>
-    <main>
-    <h2>Login</h2>
-    <form action="{{ url_for('login') }}" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" placeholder="Username" required>
-        <br>
-        <label for="password">Password:</label>
-        <div class="password-container">
-            <input type="password" id="password" name="password" placeholder="Password" required>
+        <div class="form-column">
+            <main>
+                <br>
+                <a href="{{ url_for('index') }}"><h1>Kurikirana</h1></a> 
+                <br>
+                <h2>Login</h2>
+                <form action="{{ url_for('login') }}" method="post">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" placeholder="Username" required>
+                    <br>
+                    <label for="password">Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <i class="fas fa-eye" id="password-toggle"></i>
+                    </div>
+                    <br>
+                    <input type="submit" value="Login">
+                </form>
+                <p>
+                    Or Login with your google account
+                    <br>
+                    <a href="{{ url_for('google_login') }}" class="btn">Login with Google</a>
+                </p>
+                <p>
+                    Don't have an account?
+                    <br>
+                    <a href="{{ url_for('register') }}" class="btn">Register</a>
+                </p>
+            </main>
         </div>
-        <br>
-        <input type="submit" value="Login">
-    </form>
-    <p> Or Login with your google account 
-        <br>
-        <a href="{{ url_for('google_login') }}" class="btn">Login with Google</a>
-    </p>
-    <p>Don't have an account? <a href="{{ url_for('login') }}">
-        <br>
-        <a href="{{ url_for('register') }}" class="btn">Register</a>
-     </p>
- 
-    </main>
-    <!-- <footer>
-        <p>&copy; 2025 Kurikirana</p>
-    </footer> -->
+    </div>
+    <script>
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('password-toggle');
+
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
+
 </html>

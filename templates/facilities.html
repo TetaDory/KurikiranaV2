@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<!-- <link rel="stylesheet" href="assets/css/main.css" /> -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/facilities.css') }}">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 	</head>
 	<body class="is-preload">
@@ -14,33 +15,82 @@
 			<div id="wrapper">
 
 				<!-- Main -->
-					<div id="main">
-						<div class="inner">
+				<div id="main">
+                    <div class="inner">
 
-							<!-- Header -->
-								<header id="header">
-									<a href="{{ url_for('index') }}" class="logo"><strong>Kurikirana</strong></a>
-									<ul class="icons">
-                                        {% if current_user.is_authenticated or session['google_user'] %}
-                                        <a href="{{ url_for('logout') }}"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
-                                        {% else %}
-                                        <li></li><span class="label"><a href="{{ url_for('login') }}">Login</span></a></li>
-                                        <li></li><span class="label"><a href="{{ url_for('register') }}">Register</span></a></li>
-										{% endif %}
-							
-										<!-- <li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-										<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
-										<li><a href="#" class="icon brands fa-snapchat-ghost"><span class="label">Snapchat</span></a></li>
-										<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-										<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li> -->
-									</ul>
-								</header>
+                        <header id="header">
+                            <a href="{{ url_for('index') }}" class="logo"><strong>Kurikirana</strong></a>
+                            <ul class="icons">
+                                {% if current_user.is_authenticated or session['google_user'] %}
+								<li><span class="label"><a href="{{ url_for('index') }}">Home</span></a></li>
+                                <a href="{{ url_for('logout') }}"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+                                {% else %}
+                                <li></li><span class="label"><a href="{{ url_for('login') }}">Login</span></a></li>
+								<br>
+                                <li></li><span class="label"><a href="{{ url_for('register') }}">Register</span></a></li>
+                                {% endif %}
+                            </ul>
+                        </header>
+						<div class="province-cards-container">
+							<div class="province-card" id="kigali-card">
+								<div class="dash-counts">
+									<h4 id="kigali-count">{{ kigali_count }}</h4>
+									<h5>Kigali Facilities</h5>
+								</div>
+								<div class="dash-imgs">
+									<i class="fas fa-city"></i> 
+								</div>
+							</div>
+						
+							<div class="province-card" id="northern-card">
+								<div class="dash-counts">
+									<h4 id="northern-count">{{ northern_count }}</h4>
+									<h5>Northern Province Facilities</h5>
+								</div>
+								<div class="dash-imgs">
+									<i class="fas fa-snowflake"></i> 
+								</div>
+							</div>
+
+							<div class="province-card" id="southern-card">
+								<div class="dash-counts">
+									<h4 id="southern-count">{{ southern_count }}</h4>
+									<h5>Southern Province Facilities</h5>
+								</div>
+								<div class="dash-imgs">
+									<i class="fas fa-mountain"></i> 
+								</div>
+							</div>
+
+							<div class="province-card" id="western-card">
+								<div class="dash-counts">
+									<h4 id="western-count">{{ western_count }}</h4>
+									<h5>Western Province Facilities</h5>
+								</div>
+								<div class="dash-imgs">
+									<i class="fas fa-tree"></i> 
+								</div>
+							</div>
+
+							<div class="province-card" id="eastern-card">
+								<div class="dash-counts">
+									<h4 id="eastern-count">{{ eastern_count }}</h4>
+									<h5>Eastern Province Facilities</h5>
+								</div>
+								<div class="dash-imgs">
+									<i class="fas fa-sun"></i> 
+								</div>
+							</div>		
+						</div>
 								<div class="container">
+									<input type="text" id="facilitySearch" placeholder="Search facilities..." />
+									<br>
 									<h2>Select a Facility</h2>
-									<div class="facility-list">
+									<div class="facility-list" id="facilityList">
 									{% for facility in facilities %}
 										<div class="facility-item">
 											<span>{{ facility.facility_name }}</span>
+											<!-- <span>{{ facility.facility_location }}</span> -->
 												<a href="{{ url_for('management', facility_id=facility.id) }}">Select</a>
 												<form action="{{ url_for('delete_facility', facility_id=facility.id) }}" method="POST" style="display:inline;">
 												<button type="submit" class="delete" onclick="return confirm('Are you sure you want to delete this facility?')">Delete</button>
@@ -67,43 +117,7 @@
 									</form>
 								</div>
 								</div>
-				<!-- Sidebar -->
-					<div id="sidebar">
-						<div class="inner">
-							<!-- Menu -->
-								<nav id="menu">
-									<header class="major">
-										<h2>Menu</h2>
-									</header>
-									<ul>
-                                        {% if current_user.is_authenticated or session['google_user'] %}
-										<li><a href="{{ url_for('index') }}">Homepage</a></li>
-										<!-- <li><a href="{{ url_for('generic') }}">Generic</a></li> -->
-                                        <li><a href="{{ url_for('facilities')}}">Facilities Management</a>
-										<li>
-											<span class="opener">Facilities</span>
-											<ul>
-												<li><a href="#">Bishyenyi</a></li>
-												<li><a href="#">Kigali</a></li>
-												<li><a href="#">Gikondo</a></li>
-											</ul>
-                                            {% else %}
-                                            <li><a href="{{ url_for('index') }}">Homepage</a></li>
-                                            {% endif %}
-										</li>
-										<li><a href="{{ url_for('aboutus') }}">About Us</a></li>
-										<li><a href="{{ url_for('contact') }}">Contact Us</a></li>
-                                        {% if current_user.is_authenticated or session['google_user'] %}
-                                        <li><a href="{{ url_for('logout') }}">
-                                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                                        </a></li>
-                                        {% endif %}
-									</ul>
-								</nav>
-						</div>
-					</div>
 
-			</div>
 		<!-- Scripts -->
 			<script src="static/js/jquery.min.js"></script>
 			<script src="https://kit.fontawesome.com/6c9e56babf.js" crossorigin="anonymous"></script>
@@ -119,7 +133,24 @@
 						function closePopup() {
 							facilityPopup.classList.remove("open-popup");
 						}
-					</script>
+
+				// Search functionality
+				document.getElementById('facilitySearch').addEventListener('input', function() {
+                let filter = this.value.toUpperCase();
+                let facilityList = document.getElementById('facilityList');
+                let facilities = facilityList.getElementsByClassName('facility-item');
+
+                for (let i = 0; i < facilities.length; i++) {
+                    let facilityName = facilities[i].getElementsByTagName('span')[0];
+                    if (facilityName.textContent.toUpperCase().indexOf(filter) > -1) {
+                        facilities[i].style.display = '';
+                    } else {
+                        facilities[i].style.display = 'none';
+                    }
+                }
+            });
+
+			</script>
             <!-- <footer>
                 <p>&copy; 2025 Kurikirana</p>
             </footer> -->

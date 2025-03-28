@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, UserMixin, login_required, logout_user, current_user
 from datetime import datetime, timedelta
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, IntegerField, FloatField
+from wtforms import StringField, SubmitField, DateField, IntegerField, FloatField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired
 from sqlalchemy.dialects import postgresql
 from flask_oauthlib.client import OAuth, OAuthException
@@ -22,7 +22,7 @@ app = Flask(__name__, template_folder='templates')
 secret_key = secrets.token_hex(32)
 
 app.config['SECRET_KEY'] = 'secret_key'
-# print(f"Your secret key is: {secret_key}")
+print(f"Your secret key is: {secret_key}")
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
 app.config['SESSION_PERMANENT'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sitedb'
@@ -67,19 +67,32 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
 
+# Removed Category Model
+# class Category(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(100), nullable=False)
+#     posts = db.relationship('Post', backref=db.backref('category', lazy=True)) # Relationship with Post
+
+#     def __repr__(self):
+#         return f"Category('{self.name}')"
 
 class PostForm(FlaskForm):
     food_name = StringField('Food Name', validators=[DataRequired()])
     batch_number = StringField('Batch Number', validators=[DataRequired()])
     optimum_temperature = StringField('Optimum Temperature (°C)', validators=[DataRequired()])
     optimum_humidity = StringField('Optimum Humidity (g/kg)', validators=[DataRequired()])
-    date_stored = DateField('Date Stored', format='%Y-%m-%d', validators=[DataRequired()])
-    expiration_date = DateField('Expiration Date', format='%Y-%m-%d', validators=[DataRequired()])
+    date_stored = DateField('Expiration Date', format='%Y-%m-%d')
+    expiration_date = DateField('Date Stored', format='%Y-%m-%d')
     unit = StringField('Unit of Measurement', validators=[DataRequired()])
-    quantity = IntegerField('Quantity', validators=[DataRequired()])
-    re_order = IntegerField('Re-order Level', validators=[DataRequired()])
-    unit_price = FloatField('Unit Price', validators=[DataRequired()])
-    min_stock = IntegerField("Initial Stock", validators=[DataRequired()])
+    quantity = IntegerField('Quantity', default=0)
+    unit_price = FloatField('Unit Price', default=0.0)
+    min_stock = IntegerField("Initial Stock", default = 0)
+    category = SelectMultipleField(
+            'Select Your Choices',
+            choices=[('choice1', 'Choice 1'), ('choice2', 'Choice 2'), ('choice3', 'Choice 3')],
+            validators=[DataRequired()]
+            )
+    
     # supplier = StringField('Supplier', validators=[DataRequired()])
     submit = SubmitField('Add Item')
 
@@ -94,10 +107,10 @@ class Post(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     facility_id = db.Column(db.Integer, db.ForeignKey('facility.id'), nullable=False)
+    category = db.Column(db.String(100))
     user = db.relationship('User', backref=db.backref('posts', lazy=True))
     facility = db.relationship('Facility', backref=db.backref('posts', lazy=True))
     quantity = db.Column(db.Integer, default=0)
-    re_order = db.Column(db.Integer, default=0)
     unit_price = db.Column(db.Float, default=0.0)
     unit = db.Column(db.String(50), nullable=True)
     # supplier = db.Column(db.String(200), nullable=True)
@@ -160,7 +173,7 @@ def register():
         if existing_user:
             flash('Username already taken. Please choose another username.', 'danger')
             return redirect(url_for('register'))
-        
+
         # Check if the email already exists
         existing_email = User.query.filter_by(email=email).first()
         if existing_email:
@@ -190,7 +203,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('index'))
-    
+
     return render_template('login.html')
 
 @app.route('/login/google')
@@ -307,48 +320,11 @@ def explore():
     return render_template('explore.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored)
 
 @app.route('/facilities')
-def your_route():
+@login_required
+def facilities():
     facilities = Facility.query.all()
+    return render_template('facilities.html', facilities=facilities)
 
-    # Initialize counts
-    kigali_count = 0
-    eastern_count = 0
-    southern_count = 0
-    western_count = 0
-    northern_count = 0
-
-    # Count facilities based on location
-    for facility in facilities:
-        location = facility.facility_location.strip().lower()
-        # print(f"Facility Location: {location}")  # Debugging
-
-        if "kigali province" in location or "kigali" in location:
-            kigali_count += 1
-            # print("Kigali count incremented")
-        elif "eastern province" in location or "eastern" in location:
-            eastern_count += 1
-            # print("Eastern count incremented")
-        elif "southern province" in location or "southern" in location:
-            southern_count += 1
-            # print("Southern count incremented")
-        elif "western province" in location or "western" in location:
-            western_count += 1
-            # print("Western count incremented")
-        elif "northern province" in location or "northern" in location:
-            northern_count += 1
-            # print("Northern count incremented")
-        else:
-            print("No province match")  # Debugging
-
-    return render_template(
-        'facilities.html',
-        facilities=facilities,
-        kigali_count=kigali_count,
-        eastern_count=eastern_count,
-        southern_count=southern_count,
-        western_count=western_count,
-        northern_count=northern_count,
-    )
 @app.route('/add_facility', methods=['POST'])
 @login_required
 def add_facility():
@@ -385,11 +361,11 @@ def inventory(facility_id):
         expiration_date = form.expiration_date.data
         date_stored = form.date_stored.data
         quantity = form.quantity.data
-        re_order = form.re_order.data
-        unit_price = form.unit_price.data
+        category = form.category.data
+        unit_price = form.unit.data
         unit = form.unit.data
         min_stock = form.min_stock.data
-        
+
         facility_id=facility_id
 
         # Create a new post instance
@@ -401,7 +377,7 @@ def inventory(facility_id):
             expiration_date=expiration_date,
             date_stored=date_stored,
             quantity=quantity,
-            re_order=re_order,
+            category=category,
             unit_price=unit_price,
             unit=unit,
             min_stock=min_stock,
@@ -411,25 +387,6 @@ def inventory(facility_id):
         db.session.add(new_post)
         db.session.commit()
 
-        for post in posts:
-            re_order_level = post.re_order if post.re_order is not None else 0  # Default re_order level
-        if post.quantity <= re_order_level:
-            post.re_order_required = "Yes"
-        else:
-            post.re_order_required = "No"
-
-        if post.expiration_date:
-            expiry_date = post.expiration_date
-            today = datetime.utcnow().date()
-            days_until_expiry = (expiry_date - today).days
-
-        if days_until_expiry < 0:
-            post.expiry_class = "expired"
-        elif days_until_expiry <= 7:
-            post.expiry_class = "expiring-soon"
-        else:
-            post.expiry_class = ""
-            
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
         all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
@@ -438,37 +395,14 @@ def inventory(facility_id):
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
         all_date_stored = Post.query.filter_by(facility_id=facility_id).all()
         all_quantity = Post.query.filter_by(facility_id=facility_id).all()
-        all_re_order = Post.query.filter_by(facility_id=facility_id).all()
+        all_category = Post.query.filter_by(facility_id=facility_id).all()
         all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
         all_unit = Post.query.filter_by(facility_id=facility_id).all()
         all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
         # Pass the list of Food Names to the template
-        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity,re_order=all_re_order, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, category=all_category, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
     else:
-        # Retrieve all Food Names from the database filtered by facility
-        posts = Post.query.filter_by(facility_id=facility_id).all()
-
-        # Calculate re-order status and add to each post
-        for post in posts:
-            re_order_level = post.re_order if post.re_order is not None else 0  # Default re_order level
-        if post.quantity <= re_order_level:
-            post.re_order_required = "Yes"
-        else:
-            post.re_order_required = "No"
-
-        if post.expiration_date:
-            expiry_date = post.expiration_date
-            today = datetime.utcnow().date()
-            days_until_expiry = (expiry_date - today).days
-
-            if days_until_expiry < 0:
-                post.expiry_class = "expired"
-            elif days_until_expiry <= 7:
-                post.expiry_class = "expiring-soon"
-            else:
-                post.expiry_class = ""
-
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
         all_batch_number = Post.query.filter_by(facility_id=facility_id).all()
@@ -477,12 +411,12 @@ def inventory(facility_id):
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
         all_date_stored = Post.query.filter_by(facility_id=facility_id).all()
         all_quantity = Post.query.filter_by(facility_id=facility_id).all()
-        all_re_order = Post.query.filter_by(facility_id=facility_id).all()
+        all_category = Post.query.filter_by(facility_id=facility_id).all()
         all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
         all_unit = Post.query.filter_by(facility_id=facility_id).all()
         all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
-        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, re_order=all_re_order, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('inventory.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, category=all_category, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
 
 @app.route('/quantity_logs/<int:facility_id>')
 def quantity_logs(facility_id):
@@ -524,8 +458,8 @@ def management(facility_id):
         expiration_date = form.expiration_date.data
         date_stored = form.date_stored.data
         quantity = form.quantity.data
-        re_order = form.re_order.data
-        unit_price = form.unit_price.data
+        category = form.category.data
+        unit_price = form.unit.data
         unit = form.unit.data
         min_stock = form.min_stock.data
         facility_id=facility_id
@@ -539,7 +473,7 @@ def management(facility_id):
             expiration_date=expiration_date,
             date_stored=date_stored,
             quantity=quantity,
-            re_order=re_order,
+            category=category,
             unit_price=unit_price,
             unit=unit,
             min_stock=min_stock,
@@ -557,45 +491,13 @@ def management(facility_id):
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
         all_date_stored = Post.query.filter_by(facility_id=facility_id).all()
         all_quantity = Post.query.filter_by(facility_id=facility_id).all()
-        all_re_order = Post.query.filter_by(facility_id=facility_id).all()
+        all_category = Post.query.filter_by(facility_id=facility_id).all()
         all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
         all_unit = Post.query.filter_by(facility_id=facility_id).all()
         all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
-        for post in all_food_names:
-            if post.date_stored:
-                time_diff = datetime.utcnow().date() - post.date_stored
-                days = time_diff.days
-
-                if days >= 365:
-                    years = days // 365
-                    remaining_days = days % 365
-                    months = remaining_days // 30  # Rough approximation
-                    if months > 0:
-                        post.time_in_storage = f"{years} year{ 's' if years > 1 else '' } {months} month{ 's' if months > 1 else '' }"
-                    else:
-                        post.time_in_storage = f"{years} year{ 's' if years > 1 else '' }"
-                elif days > 30:
-                    months = days // 30
-                    post.time_in_storage = f"{months} month{ 's' if months > 1 else '' }"
-                else:
-                    post.time_in_storage = f"{days} day{ 's' if days > 1 else '' }"
-            else:
-                post.time_in_storage = "N/A"
-
-            if post.expiration_date:
-                expiry_date = post.expiration_date
-                today = datetime.utcnow().date()
-                days_until_expiry = (expiry_date - today).days
-
-            if days_until_expiry < 0:
-                post.expiry_class = "expired"
-            elif days_until_expiry <= 7:
-                post.expiry_class = "expiring-soon"
-            else:
-                post.expiry_class = ""
         # Pass the list of Food Names to the template
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_store=all_date_stored, quantity=all_quantity, re_order=all_re_order, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, category=all_category, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
     else:
         # Retrieve all Food Names from the database filtered by facility
         all_food_names = Post.query.filter_by(facility_id=facility_id).all()
@@ -605,45 +507,12 @@ def management(facility_id):
         all_expiration_date = Post.query.filter_by(facility_id=facility_id).all()
         all_date_stored = Post.query.filter_by(facility_id=facility_id).all()
         all_quantity = Post.query.filter_by(facility_id=facility_id).all()
-        all_re_order = Post.query.filter_by(facility_id=facility_id).all()
+        all_category = Post.query.filter_by(facility_id=facility_id).all()
         all_unit_price = Post.query.filter_by(facility_id=facility_id).all()
         all_unit = Post.query.filter_by(facility_id=facility_id).all()
         all_min_stock = Post.query.filter_by(facility_id=facility_id).all()
 
-        for post in all_food_names:
-            if post.date_stored:
-                time_diff = datetime.utcnow().date() - post.date_stored
-                days = time_diff.days
-
-                if days >= 365:
-                    years = days // 365
-                    remaining_days = days % 365
-                    months = remaining_days // 30  # Rough approximation
-                    if months > 0:
-                        post.time_in_storage = f"{years} year{ 's' if years > 1 else '' } {months} month{ 's' if months > 1 else '' }"
-                    else:
-                        post.time_in_storage = f"{years} year{ 's' if years > 1 else '' }"
-                elif days > 30:
-                    months = days // 30
-                    post.time_in_storage = f"{months} month{ 's' if months > 1 else '' }"
-                else:
-                    post.time_in_storage = f"{days} day{ 's' if days > 1 else '' }"
-            else:
-                post.time_in_storage = "N/A"
-
-            if post.expiration_date:
-                expiry_date = post.expiration_date
-                today = datetime.utcnow().date()
-                days_until_expiry = (expiry_date - today).days
-
-            if days_until_expiry < 0:
-                post.expiry_class = "expired"
-            elif days_until_expiry <= 7:
-                post.expiry_class = "expiring-soon"
-            else:
-                post.expiry_class = ""
-
-        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, re_order=all_re_order, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
+        return render_template('management.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored, quantity=all_quantity, category=all_category, unit_price=all_unit_price, unit=all_unit, min_stock=all_min_stock, form=form, current_user=current_user, facility_id=facility_id, facility_name=facility.facility_name, facility_location=facility.facility_location)
 
 @app.route('/tempreport')
 # @login_required
@@ -654,7 +523,7 @@ def tempreport():
         return redirect(url_for('management', facility_id=first_facility.id))
     else:
         return redirect(url_for('facilities'))
-    
+
 @app.route('/humireport')
 # @login_required
 def humireport():
@@ -676,7 +545,7 @@ def get_temperature_alerts():
     for post in posts:
         item_id = post.id
         max_temp = float(post.optimum_temperature)
-        item_data = data.get(item_id, {})
+        item_data = data.get(item_id, {}) 
         temperatures = item_data.get('temperature', [])
 
         item_alerts = []

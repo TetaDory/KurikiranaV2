@@ -14,6 +14,15 @@
     font-family: 'Poppins';
 }
 
+.expired {
+    color: red;
+    font-weight: bold;
+}
+
+.expiring-soon {
+    color: orange;
+}
+
 body {
     display: flex;
     height: 100vh;
@@ -250,6 +259,16 @@ canvas {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+form { 
+    text-align: left;
+    border-radius: 10px;
+}
+
+.form-control {
+    border-radius: 5px;
+    border-width: 1px;
+}
+
 .btn{
     padding: 10px;
     padding-left: 20px;
@@ -287,7 +306,7 @@ canvas {
 .popup {
     width: 900px;
     background: transparent;
-    border-radius: 6px;
+    border-radius: 10px;
     position: absolute;
     top: 0%;
     left: 57%;

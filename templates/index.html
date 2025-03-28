@@ -173,19 +173,19 @@
 										<li><a href="{{ url_for('index') }}">Homepage</a></li>
 										<!-- <li><a href="{{ url_for('generic') }}">Generic</a></li> -->
                                         <li><a href="{{ url_for('facilities')}}">Facilities Management</a>
-										<li>
-											<span class="opener">Facilities</span>
-											<ul>
+										<!-- <li> -->
+											<!-- <span class="opener">Facilities</span> -->
+											<!-- <ul>
 												<li><a href="#">Bishyenyi</a></li>
 												<li><a href="#">Kigali</a></li>
 												<li><a href="#">Gikondo</a></li>
-											</ul>
+											</ul> -->
                                             {% else %}
                                             <li><a href="{{ url_for('index') }}">Homepage</a></li>
                                             {% endif %}
-										</li>
-										<li><a href="{{ url_for('aboutus') }}">About Us</a></li>
-										<li><a href="{{ url_for('contact') }}">Contact Us</a></li>
+										<!-- </li> -->
+										<li><a href="{{ url_for('aboutus') }}">About us</a></li>
+										<li><a href="{{ url_for('contact') }}">Contact us</a></li>
                                         {% if current_user.is_authenticated or session['google_user'] %}
                                         <li><a href="{{ url_for('logout') }}">
                                             <i class="fa-solid fa-arrow-right-from-bracket"></i>

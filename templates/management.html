@@ -9,6 +9,7 @@
         <script src="https://js.stripe.com/v3/"></script>
     </head>
     <body>
+        
         <header>
             <div class="header-left">
                 <h1>Kurikirana</h1>
@@ -26,8 +27,8 @@
                     <div class="dropdown-content">
                         {% if current_user.is_authenticated or session['google_user'] %}
                             <a href="{{ url_for('index') }}">Home</a>
-                            <a href="{{ url_for('aboutus') }}">About Us</a>
-                            <a href="{{ url_for('contact') }}">Contact Us</a>
+                            <a href="{{ url_for('aboutus') }}">About us</a>
+                            <a href="{{ url_for('contact') }}">Contact us</a>
                             <a href="{{ url_for('logout') }}">
                                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                             </a>
@@ -54,8 +55,8 @@
                   </div>
                 </li>
                 <li><a href="{{ url_for('inventory', facility_id=facility_id) }}">Inventory</a></li>
-                <li><a href="{{ url_for('contact')}}">Contact Us</a></li>
-                <li><a href="{{ url_for('aboutus')}}">About Us</a></li>
+                <li><a href="{{ url_for('contact')}}">Contact us</a></li>
+                <li><a href="{{ url_for('aboutus')}}">About us</a></li>
                 <a href="{{ url_for('logout') }}">
                     <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 </a>
@@ -70,7 +71,8 @@
                     <th>Batch Number</th>
                     <th>Optimum Temperature (°C)</th>
                     <th>Optimum Humidity (g/kg)</th>
-                    <th>Expiration Date (g/kg)</th>
+                    <th>Time in Storage</th>
+                    <th>Expiry Date</th>
                     <th>Actions</th>
                 </tr>
                 {% for post in posts %}
@@ -79,7 +81,8 @@
                     <td>{{ post.batch_number }}</td>
                     <td>{{ post.optimum_temperature }}</td>
                     <td>{{ post.optimum_humidity }}</td>
-                    <td>{{ post.expiration_date }}</td>
+                    <td>{{ post.time_in_storage }}</td> 
+                    <td class="{{ post.expiry_class }}">{{ post.expiration_date }}</td>
                     <td>
                         <a href="{{ url_for('dashboard', item_id=post.id) }}">Dashboard</a>
                         <!-- <a href="{{ url_for('edit_food', id=post.id) }}">Edit</a> -->
@@ -90,7 +93,6 @@
                 </tr>
                 {% endfor %}
             </table>
-
             <button type="submit" class="btn" onclick="openPopup()">Add New Item</button>
             <div class="popup" id="popup">
                 <i class="fa fa-close" onclick="closePopup()"></i> 
@@ -120,6 +122,11 @@
                     </div>
                     <br>
                     <div class="mb-3">
+                        {{ form.date_stored.label }}
+                        {{ form.date_stored(class="form-control") }}
+                    </div>
+                    <br>
+                    <div class="mb-3">
                         {{ form.expiration_date.label }}
                         {{ form.expiration_date(class="form-control") }}
                     </div>
@@ -132,6 +139,11 @@
                     <div class="mb-3">
                         {{ form.quantity.label }}
                         {{ form.quantity(class="form-control") }}
+                    </div>
+                    <br>
+                    <div class="mb-3">
+                        {{ form.re_order.label }}
+                        {{ form.re_order(class="form-control") }}
                     </div>
                     <br>
                     <div class="mb-3">
@@ -151,9 +163,9 @@
                 </form>
             </div>
         </div>
-    <footer>
+    <!-- <footer>
             <p>&copy; 2025 Kurikirana</p>
-    </footer>
+    </footer> -->
     <script>
         let popup = document.getElementById("popup");
         let editpopup = document.getElementById("editpopup");

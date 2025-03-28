@@ -21,7 +21,7 @@
                 <div class="dropdown-content">
                     {% if current_user.is_authenticated or session['google_user'] %}
                         <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                        <a href="{{ url_for('aboutus') }}">About Us</a>
+                        <a href="{{ url_for('aboutus') }}">About us</a>
                         <a href="{{ url_for('logout') }}">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </a>

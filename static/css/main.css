@@ -16,7 +16,7 @@ tfoot, thead, tr, th, td, article, aside,
 canvas, details, embed, figure, figcaption,
 footer, header, hgroup, menu, nav, output, ruby,
 section, summary, time, mark, audio, video {
-  margin: 0;
+  /* margin: 0; */
   padding: 0;
   border: 0;
   font-size: 100%;
@@ -1008,7 +1008,9 @@ header.main > :last-child {
 
 /* Form */
 form {
-  margin: 0 0 2em 0; }
+  /* margin: 0 0 2em 0;  */
+  align-items: center;
+}
 
 label {
   color: #3d4449;
@@ -2285,7 +2287,7 @@ button,
 
 .container {
   width: 80%;
-  margin: 20px auto;
+  /* margin: 20px auto; */
 }
 
 .facility-list {

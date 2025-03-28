@@ -21,6 +21,15 @@ body {
     /* background-image: linear-gradient(#5A67BA, #9EA5D6, white); */
 }
 
+.expired {
+    color: red;
+    font-weight: bold;
+}
+
+.expiring-soon {
+    color: orange;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
