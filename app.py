@@ -307,7 +307,7 @@ def explore():
     return render_template('explore.html', posts=all_food_names, batch_number=all_batch_number, optimum_temperature=all_optimum_temperature, optimum_humidity=all_optimum_humidity, expiration_date=all_expiration_date, date_stored=all_date_stored)
 
 @app.route('/facilities')
-def your_route():
+def facilities():
     facilities = Facility.query.all()
 
     # Initialize counts
