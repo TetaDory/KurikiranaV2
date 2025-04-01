@@ -371,6 +371,10 @@ def delete_facility(facility_id):
 def dashboard():
     return render_template('dashboard.html', current_user=current_user)
 
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
 @app.route('/inventory/<int:facility_id>', methods=['GET', 'POST'])
 def inventory(facility_id):
     form = PostForm()
